@@ -43,3 +43,5 @@ Deploy the `web/` folder to any static host (GitHub Pages, Netlify, Cloudflare P
 ## Notes
 
 - The app must be served over HTTP(S); opening `index.html` directly from disk (`file://`) will block fetch requests in most browsers.
+
+- The data comes from the [BSB-publishing/bsb2usfm](https://github.com/BSB-publishing/bsb2usfm) project.
