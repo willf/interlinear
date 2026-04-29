@@ -2,6 +2,8 @@ import { BOOKS } from "./books.js";
 
 const bookSelect = document.getElementById("bookSelect");
 const chapterSelect = document.getElementById("chapterSelect");
+const prevChapterBtn = document.getElementById("prevChapterBtn");
+const nextChapterBtn = document.getElementById("nextChapterBtn");
 const debugModeControl = document.getElementById("debugModeControl");
 const benchmarkControl = document.getElementById("benchmarkControl");
 const debugToggle = document.getElementById("debugToggle");
@@ -49,7 +51,44 @@ function init() {
 
   chapterSelect.addEventListener("change", () => {
     renderCurrentChapter();
+    updateChapterNavButtons();
   });
+
+  if (prevChapterBtn) {
+    prevChapterBtn.addEventListener("click", async () => {
+      const opts = [...chapterSelect.options];
+      const idx = opts.findIndex((o) => o.value === chapterSelect.value);
+      if (idx > 0) {
+        chapterSelect.value = opts[idx - 1].value;
+        renderCurrentChapter();
+        updateChapterNavButtons();
+      } else {
+        const bookIdx = BOOKS.findIndex((b) => b.file === currentBook.file);
+        const prevBookIdx = (bookIdx - 1 + BOOKS.length) % BOOKS.length;
+        currentBook = BOOKS[prevBookIdx];
+        bookSelect.value = currentBook.file;
+        await loadBook(currentBook, "last");
+      }
+    });
+  }
+
+  if (nextChapterBtn) {
+    nextChapterBtn.addEventListener("click", async () => {
+      const opts = [...chapterSelect.options];
+      const idx = opts.findIndex((o) => o.value === chapterSelect.value);
+      if (idx < opts.length - 1) {
+        chapterSelect.value = opts[idx + 1].value;
+        renderCurrentChapter();
+        updateChapterNavButtons();
+      } else {
+        const bookIdx = BOOKS.findIndex((b) => b.file === currentBook.file);
+        const nextBookIdx = (bookIdx + 1) % BOOKS.length;
+        currentBook = BOOKS[nextBookIdx];
+        bookSelect.value = currentBook.file;
+        await loadBook(currentBook, "first");
+      }
+    });
+  }
 
   if (debugToggle) {
     debugToggle.addEventListener("change", () => {
@@ -90,7 +129,7 @@ function populateBookSelect() {
   bookSelect.value = currentBook.file;
 }
 
-async function loadBook(book) {
+async function loadBook(book, startChapter = "first") {
   setStatus(`Loading ${book.name}...`);
   viewer.replaceChildren();
 
@@ -106,7 +145,12 @@ async function loadBook(book) {
     parseMs = performance.now() - parseStart;
 
     populateChapterSelect(parsedBook.chapters);
+    if (startChapter === "last" && parsedBook.chapters.length > 0) {
+      const lastChapter = parsedBook.chapters[parsedBook.chapters.length - 1];
+      chapterSelect.value = String(lastChapter.chapterNum);
+    }
     renderCurrentChapter();
+    updateChapterNavButtons();
   } catch (err) {
     parsedBook = null;
     chapterSelect.replaceChildren();
@@ -280,6 +324,17 @@ function ensureVerse(chapters, chapterNum, verseNum) {
 
 function isContentParaStyle(style) {
   return /^(p|q|m|pi|li)/.test(style);
+}
+
+function updateChapterNavButtons() {
+  if (!prevChapterBtn || !nextChapterBtn) {
+    return;
+  }
+  const opts = [...chapterSelect.options];
+  const idx = opts.findIndex((o) => o.value === chapterSelect.value);
+  const bookIdx = BOOKS.findIndex((b) => b.file === currentBook.file);
+  prevChapterBtn.disabled = false;
+  nextChapterBtn.disabled = false;
 }
 
 function populateChapterSelect(chapters) {
