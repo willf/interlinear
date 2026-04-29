@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSB Interlinear Viewer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>MSB Interlinear Viewer</h1>
+        <p class="subtitle">USX token gloss + translation display</p>
+      </div>
+      <div class="controls">
+        <label>
+          Book
+          <select id="bookSelect"></select>
+        </label>
+        <label>
+          Chapter
+          <select id="chapterSelect"></select>
+        </label>
+        <label id="debugModeControl" class="debug-toggle">
+          <input id="debugToggle" type="checkbox" />
+          <span>Debug Mode</span>
+        </label>
+        <label id="benchmarkControl" class="debug-toggle">
+          <input id="benchmarkToggle" type="checkbox" />
+          <span>Benchmark</span>
+        </label>
+        <label class="debug-toggle">
+          <input id="englishToggle" type="checkbox" checked />
+          <span>Show English</span>
+        </label>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel" id="statusPanel">
+        <p id="statusText">Loading...</p>
+      </section>
+
+      <section id="viewer" class="viewer" aria-live="polite"></section>
+    </main>
+
+    <template id="verseTemplate">
+      <article class="verse-row">
+        <div class="verse-num"></div>
+        <div class="tokens"></div>
+      </article>
+    </template>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
